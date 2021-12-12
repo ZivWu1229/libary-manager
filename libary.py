@@ -41,11 +41,17 @@ class Delayed_manager():
         times = int(simpledialog.askstring('新增懲罰者','時長(天):'))*86400
         delayed_list[stu_num] += time.time()-(time.time()%86400)+times
         os.remove('user_info.json')
-        with open('user_.json','x') as file:
+        with open('user_info.json','x') as file:
             file.write(js(delayed_list))
         return
     def view(self):
-        pass
+        printing = []
+        end_time = None
+        for i in delayed_list:
+            if delayed_list[i] > time.time():
+                end_time = time.localtime(delayed_list[i])
+                printing.append(f'座號:{i},懲罰到期日:{end_time.tm_year-1911}年{end_time.tm_mon}月{end_time.tm_mday}日')
+        messagebox.showinfo('檢視懲罰者',sort_printing(printing,2))
     def delete(self):
         pass
 
@@ -54,7 +60,7 @@ def sort_printing(words,times):
     printing = ''
     while True:
         for ii in range(times):
-            printing += f'{words[index]} , '
+            printing += f'{words[index]}, '
             index += 1
             if index >= len(words):
                 return printing
