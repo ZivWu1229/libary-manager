@@ -31,7 +31,23 @@ class Borrow_win():
         self.submit = tk.Button(self.borrow_win, text='取消').pack()
 
 class Delayed_manager():
-    pass
+    def __init__(self):
+        self.win = tk.Toplevel(win1)
+        self.new_button  = tk.Button(self.win,text='新增懲罰者',command=self.new   ,font=('標楷體',28),width=15).grid(row=1,column=1)
+        self.view_button = tk.Button(self.win,text='檢視懲罰者',command=self.view  ,font=('標楷體',28),width=15).grid(row=2,column=1)
+        self.del_button  = tk.Button(self.win,text='刪除懲罰者',command=self.delete,font=('標楷體',28),width=15).grid(row=3,column=1)
+    def new(self):
+        stu_num = simpledialog.askstring('新增懲罰者','座號:')
+        times = int(simpledialog.askstring('新增懲罰者','時長(天):'))*86400
+        delayed_list[stu_num] += time.time()-(time.time()%86400)+times
+        os.remove('user_info.json')
+        with open('user_.json','x') as file:
+            file.write(js(delayed_list))
+        return
+    def view(self):
+        pass
+    def delete(self):
+        pass
 
 def sort_printing(words,times):
     index = 0
@@ -64,6 +80,11 @@ def load_book_info():
     with open('book_info.json',encoding='utf8') as file:
         book_info = json.load(file)
 
+def load_user_info():
+    global delayed_list
+    with open('user_info.json',encoding='utf8') as file:
+        delayed_list = json.load(file)
+
 def read_file():
     global borrowed_book
     with open('borrowed_book.json') as file:
@@ -90,6 +111,7 @@ def return_book(book_num):
 
 load_book_info()
 read_file()
+load_user_info()
 
 class Mode():
     def borrow(self):
