@@ -94,6 +94,7 @@ def load_user_info():
 def read_file():
     global borrowed_book
     with open('borrowed_book.json') as file:
+        print(file.read())
         borrowed_book = json.load(file)
 
 def borrow_book(book_num,stu_num):
