@@ -33,31 +33,20 @@ class Borrow_win():
 class Delayed_manager():
     def __init__(self):
         self.win = tk.Toplevel(win1)
-        self.new_button  = tk.Button(self.win,text='新增懲罰者',command=self.new   ,font=('標楷體',28),width=15).grid(row=1,column=1)
-        self.view_button = tk.Button(self.win,text='檢視懲罰者',command=self.view  ,font=('標楷體',28),width=15).grid(row=2,column=1)
-        self.del_button  = tk.Button(self.win,text='刪除懲罰者',command=self.delete,font=('標楷體',28),width=15).grid(row=3,column=1)
+        self.win.title('管理懲罰者')
+        self.new_button  = tk.Button(self.win,text='新增懲罰者',command=mode.new   ,font=('標楷體',28),width=15).grid(row=1,column=1)
+        self.view_button = tk.Button(self.win,text='檢視懲罰者',command=mode.view  ,font=('標楷體',28),width=15).grid(row=2,column=1)
+        self.del_button  = tk.Button(self.win,text='刪除懲罰者',command=mode.delete,font=('標楷體',28),width=15).grid(row=3,column=1)
     def new(self):
         stu_num = simpledialog.askstring('新增懲罰者','座號:')
         times = int(simpledialog.askstring('新增懲罰者','時長(天):'))*86400
-        delayed_list[stu_num] += time.time()-(time.time()%86400)+times
-        os.remove('user_info.json')
-        with open('user_info.json','x') as file:
-            file.write(js(delayed_list))
-        return
-    def view(self):
-        printing = []
-        end_time = None
-        for i in delayed_list:
-            if delayed_list[i] > time.time():
-                end_time = time.localtime(delayed_list[i])
-                printing.append(f'座號:{i},懲罰到期日:{end_time.tm_year-1911}年{end_time.tm_mon}月{end_time.tm_mday}日')
-        messagebox.showinfo('檢視懲罰者',sort_printing(printing,2))
-    def delete(self):
-        pass
+        mode.new(stu_num,times)
 
 def sort_printing(words,times):
     index = 0
     printing = ''
+    if len(words) == 0:
+        return 
     while True:
         for ii in range(times):
             printing += f'{words[index]}, '
@@ -94,12 +83,10 @@ def load_user_info():
 def read_file():
     global borrowed_book
     with open('borrowed_book.json') as file:
-        print(file.read())
         borrowed_book = json.load(file)
 
 def borrow_book(book_num,stu_num):
-    time_now = time.localtime(time.time())
-    borrowed_book.append([book_num,stu_num,time_now.tm_year-1911,time_now.tm_mon,time_now.tm_mday,time.time()])
+    borrowed_book.append([book_num,stu_num,time.time()-(time.time()%86400)])
     os.remove('borrowed_book.json')
     with open('borrowed_book.json','x') as file:
         file.write(js(borrowed_book))
@@ -108,11 +95,16 @@ def return_book(book_num):
     global borrowed_book
     for i in borrowed_book:
         if i[0] == book_num:
+            if messagebox.askokcancel('借書',f'座號: {i[1]},圖書編號: {book_num},書名: {book_info[book_num]}'):
+                if i[2]+86400*14 < time.time():
+                    mode.new(i[0],time.time()-(time.time()%86400)-(i[2]+86400*14))
                 borrowed_book.remove(i)
                 os.remove('borrowed_book.json')
                 with open('borrowed_book.json','x') as file:
-                        file.write(str(borrowed_book))
+                        file.write(js(borrowed_book))
                 messagebox.showinfo('還書','還書程序已完成')
+                return
+            else:
                 return
     messagebox.showinfo('還書','這本書未借出')
 
@@ -166,20 +158,55 @@ class Mode():
         else:
             if num == -1:
                 for i in borrowed_book:
-                    printing = printing + f'圖書編號: {i[0]}, 座號: {i[1]}, 借書時間: {i[2]}年 {i[3]}月 {i[4]}日\n'
-            for i in borrowed_book:
-                if i[1] == num:
-                    printing = printing + f'圖書編號: {i[0]}, 座號: {i[1]}, 借書時間: {i[2]}年 {i[3]}月 {i[4]}日\n'
+                    borrow_time = time.localtime(i[2])
+                    printing = printing + f'圖書編號: {i[0]}, 座號: {i[1]}, 借書時間: {borrow_time.tm_year-1911}年 {borrow_time.tm_mon}月 {borrow_time.tm_mday}日\n'
+            else:
+                for i in borrowed_book:
+                    borrow_time = time.localtime(i[2])
+                    if i[1] == num:
+                        printing = printing + f'圖書編號: {i[0]}, 座號: {i[1]}, 借書時間: {borrow_time.tm_year-1911}年 {borrow_time.tm_mon}月 {borrow_time.tm_mday}日\n'
             messagebox.showinfo('查詢',printing)
         print('')
     def delay(self):
         printing = []
         for i in borrowed_book:
+            borrow_time = time.localtime(i[2])
             if time.time() - i[-1] >= 1209600:
-                printing.append(f'圖書編號: {i[0]}, 座號: {i[1]}, 借書時間: {i[2]}年 {i[3]}月 {i[4]}日')
+                printing.append(f'圖書編號: {i[0]}, 座號: {i[1]}, 借書時間: {borrow_time.tm_year-1911}年 {borrow_time.tm_mon}月 {borrow_time.tm_mday}日\n')
         messagebox.showinfo('逾期未還',sort_printing(printing,1))
     def delayed_list(self):
         win = Delayed_manager()
+    #delayed list
+    def new(self,stu_num,times):        
+        if delayed_list[stu_num] > time.time():
+            delayed_list[stu_num] += times
+        else:
+            delayed_list[stu_num] = time.time()-(time.time()%86400)+times
+        os.remove('user_info.json')
+        with open('user_info.json','x') as file:
+            file.write(js(delayed_list))
+        return
+    def view(self):
+        printing = []
+        end_time = None
+        for i in delayed_list:
+            if delayed_list[i] > time.time():
+                end_time = time.localtime(delayed_list[i])
+                printing.append(f'座號:{i},懲罰到期日:{end_time.tm_year-1911}年{end_time.tm_mon}月{end_time.tm_mday}日')
+        messagebox.showinfo('檢視懲罰者',sort_printing(printing,2))
+    def delete(self):
+        stu_num = simpledialog.askstring('新增懲罰者','座號:')
+        try:
+            end_time = delayed_list[stu_num]
+        except KeyError:
+            messagebox.showerror('刪除懲罰者','查無座號')
+            return
+        end_time = time.localtime(delayed_list[stu_num])
+        if messagebox.askokcancel('刪除懲罰者',f'座號:{stu_num},懲罰結束時間:{end_time.tm_year}年{end_time.tm_mon}月{end_time.tm_mday}日確認刪除?'):
+            delayed_list[stu_num] = 0
+            os.remove('user_info.json')
+            with open('user_info.json','x') as file:
+                file.write(js(delayed_list))
 
 mode = Mode()
 select_mode = Select_mode()
