@@ -46,7 +46,7 @@ def sort_printing(words,times):
     index = 0
     printing = ''
     if len(words) == 0:
-        return 
+        return '空空如也'
     while True:
         for ii in range(times):
             printing += f'{words[index]}, '
@@ -169,7 +169,6 @@ class Mode():
                     if i[1] == num:
                         printing = printing + f'圖書編號: {i[0]}, 座號: {i[1]}, 借書時間: {borrow_time.tm_year-1911}年 {borrow_time.tm_mon}月 {borrow_time.tm_mday}日\n'
             messagebox.showinfo('查詢',printing)
-        print('')
     def delay(self):
         printing = []
         for i in borrowed_book:
