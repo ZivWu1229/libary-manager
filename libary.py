@@ -34,7 +34,7 @@ class Delayed_manager():
     def __init__(self):
         self.win = tk.Toplevel(win1)
         self.win.title('管理懲罰者')
-        self.new_button  = tk.Button(self.win,text='新增懲罰者',command=mode.new   ,font=('標楷體',28),width=15).grid(row=1,column=1)
+        self.new_button  = tk.Button(self.win,text='新增懲罰者',command=self.new   ,font=('標楷體',28),width=15).grid(row=1,column=1)
         self.view_button = tk.Button(self.win,text='檢視懲罰者',command=mode.view  ,font=('標楷體',28),width=15).grid(row=2,column=1)
         self.del_button  = tk.Button(self.win,text='刪除懲罰者',command=mode.delete,font=('標楷體',28),width=15).grid(row=3,column=1)
     def new(self):
@@ -96,7 +96,7 @@ def return_book(book_num):
     for i in borrowed_book:
         if i[0] == book_num:
             if messagebox.askokcancel('借書',f'座號: {i[1]},圖書編號: {book_num},書名: {book_info[book_num]}'):
-                if i[2]+86400*14 < time.time():
+                if i[2]+86400*14 > time.time():
                     mode.new(i[0],time.time()-(time.time()%86400)-(i[2]+86400*14))
                 borrowed_book.remove(i)
                 os.remove('borrowed_book.json')
@@ -131,6 +131,9 @@ class Mode():
                     book += 1
             if book >= 2:
                 messagebox.showinfo('借書','本使用者已借閱兩本書')
+                return
+            if delayed_list[str(stu_num)] != 0:
+                messagebox.showinfo('借書','懲罰尚未結束')
                 return
             for i in book_info:
                 if i == book_num:
@@ -177,7 +180,9 @@ class Mode():
     def delayed_list(self):
         win = Delayed_manager()
     #delayed list
-    def new(self,stu_num,times):        
+    def new(self,stu_num,times):
+        if not messagebox.askokcancel('新增懲罰者',f'座號: {stu_num} ,時長 {times} 天,確定新增懲罰者?'):
+            return
         if delayed_list[stu_num] > time.time():
             delayed_list[stu_num] += times
         else:
@@ -202,7 +207,7 @@ class Mode():
             messagebox.showerror('刪除懲罰者','查無座號')
             return
         end_time = time.localtime(delayed_list[stu_num])
-        if messagebox.askokcancel('刪除懲罰者',f'座號:{stu_num},懲罰結束時間:{end_time.tm_year}年{end_time.tm_mon}月{end_time.tm_mday}日確認刪除?'):
+        if messagebox.askokcancel('刪除懲罰者',f'座號:{stu_num},懲罰結束時間:{end_time.tm_year}年{end_time.tm_mon}月{end_time.tm_mday}日,確認刪除?'):
             delayed_list[stu_num] = 0
             os.remove('user_info.json')
             with open('user_info.json','x') as file:
