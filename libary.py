@@ -181,7 +181,7 @@ class Mode():
         win = Delayed_manager()
     #delayed list
     def new(self,stu_num,times):
-        if not messagebox.askokcancel('新增懲罰者',f'座號: {stu_num} ,時長 {times} 天,確定新增懲罰者?'):
+        if not messagebox.askokcancel('新增懲罰者',f'座號: {stu_num} ,時長 {times//86400} 天,確定新增懲罰者?'):
             return
         if delayed_list[stu_num] > time.time():
             delayed_list[stu_num] += times
