@@ -96,7 +96,7 @@ def return_book(book_num):
     for i in borrowed_book:
         if i[0] == book_num:
             if messagebox.askokcancel('借書',f'座號: {i[1]},圖書編號: {book_num},書名: {book_info[book_num]}'):
-                if i[2]+86400*14 > time.time():
+                if i[2]+86400*14 < time.time():
                     mode.new(i[0],time.time()-(time.time()%86400)-(i[2]+86400*14))
                 borrowed_book.remove(i)
                 os.remove('borrowed_book.json')
@@ -132,7 +132,7 @@ class Mode():
             if book >= 2:
                 messagebox.showinfo('借書','本使用者已借閱兩本書')
                 return
-            if delayed_list[str(stu_num)] != 0:
+            if delayed_list[str(stu_num)] > 0:
                 messagebox.showinfo('借書','懲罰尚未結束')
                 return
             for i in book_info:
