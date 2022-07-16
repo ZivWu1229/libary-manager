@@ -2,4 +2,4 @@ version 2.0
 book_manager.py:
     add function html
     del function sort_printing
-    View book function is no longer using tkinter window, we use a web browser instead, makes it more easy to read
+    View book function is no longer using tkinter window, we use a web browser instead, makes it more easy to read.
