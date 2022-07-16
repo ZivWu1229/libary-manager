@@ -2,8 +2,29 @@ import tkinter as tk
 from tkinter import simpledialog,messagebox
 import json
 import os
+import webbrowser
 
 book_info = {}
+
+def html(title,body):
+    html = f'''<!DOCTYPE html>
+<html>
+<head>
+<title>{title}</title>
+</head>
+<body>
+'''
+    for i in body:
+        html += f'<p>{i}</p>\n'
+    html += '''</body>
+</html>'''
+    try:
+        os.remove('index.html')
+    except:
+        pass
+    with open('index.html','x') as file:
+        file.write(html)
+    webbrowser.open('index.html')
 
 def sort_printing(words,times):
     index = 0
@@ -61,7 +82,7 @@ def view_book():
     printing_str = []
     for i in book_info:
         printing_str.append(f'圖書編號: {i}, 書名: {book_info[i]}')
-    messagebox.showinfo('book manager',sort_printing(printing_str,2))
+    html('book manager',printing_str)
 
 load_book_info()
 
