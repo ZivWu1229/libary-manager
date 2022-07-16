@@ -26,17 +26,6 @@ def html(title,body):
         file.write(html)
     webbrowser.open('index.html')
 
-def sort_printing(words,times):
-    index = 0
-    printing = ''
-    while True:
-        for ii in range(times):
-            printing += f'{words[index]} , '
-            index += 1
-            if index >= len(words):
-                return printing
-        printing += '\n'
-
 def load_book_info():
     global book_info
     with open('book_info.json',encoding='utf8') as file:
