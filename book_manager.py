@@ -67,9 +67,7 @@ class Adding_book():
             book_nums.append(int(i))
         self.number .set(max(book_nums) %100+1)
         self.section.set(max(book_nums)//100)
-        print(type(self.number.get()))
         if int(self.number.get()) < 10:
-            print(True)
             self.number.set('0'+self.number.get())
     def submit(self):
         try:
