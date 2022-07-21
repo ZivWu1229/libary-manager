@@ -1,5 +1,7 @@
 version 2.0
 book_manager.py:
-    add function html
+    add function HTML
+        class    Adding_book
     del function sort_printing
-    View book function is no longer using tkinter window, we use a web browser instead, makes it more easy to read.
+We redesign the "Adding book window." It'll automatically generate a number when adding books.
+View book function is no longer using the Tkinter window. We use a web browser instead.
